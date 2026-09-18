@@ -1,0 +1,184 @@
+---
+import Layout from '../../layouts/BlogPost.astro';
+
+const projects = [
+  {
+    slug: 'mobil-uygulama',
+    title: 'Mobil Uygulama',
+    category: 'Flutter / .NET',
+    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80',
+    excerpt: 'Mobil kullanıcı deneyimi odaklı, hızlı ve güvenli bir uygulama geliştirme süreci.',
+    details: [
+      'Kullanıcı dostu arayüz tasarımı üzerine çalıştım.',
+      'Sunucu tarafı entegrasyonu ile gerçek zamanlı veri akışı kurdum.',
+      'Uygulama içi performans optimizasyonu ve hata yönetimi yaptım.'
+    ],
+    tags: ['Flutter', 'REST API', 'UI/UX']
+  },
+  {
+    slug: 'web-platformu',
+    title: 'Web Platformu',
+    category: 'Astro / TypeScript',
+    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+    excerpt: 'İşletme içi operasyonları kolaylaştıran modern ve ölçeklenebilir web çözümü.',
+    details: [
+      'İçerik yönetimi ve iş akışı odaklı sayfa yapısı kurdum.',
+      'Responsive tasarım ile mobil uyumluluğu sağladım.',
+      'Kullanıcı etkileşimini artıran modern bileşen yapısı oluşturdum.'
+    ],
+    tags: ['Astro', 'TypeScript', 'Dashboard']
+  },
+  {
+    slug: 'otomasyon-sistemi',
+    title: 'Otomasyon Sistemi',
+    category: 'Python / API',
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    excerpt: 'Zaman tasarrufu sağlayan otomatik iş akışları ve raporlama altyapısı.',
+    details: [
+      'Tekrarlayan işlemleri otomatikleştirdim.',
+      'İş akışlarını sadeleştirerek operasyonel verimliliği artırdım.',
+      'Raporlama ve veri çıkarımı için altyapı hazırladım.'
+    ],
+    tags: ['Python', 'API', 'Automation']
+  },
+  {
+    slug: 'veri-analizi',
+    title: 'Veri Analizi',
+    category: 'Data / Dashboard',
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80',
+    excerpt: 'Veri görselleştirme ve karar destek sistemleri için hazırlanan analitik çalışma.',
+    details: [
+      'Yapısal verileri görselleştirecek paneller hazırladım.',
+      'Performans metriklerini anlamlı şekilde sunan açıklayıcı raporlar oluşturdum.',
+      'İş kararlarını destekleyecek veri temelli çıktılar ürettim.'
+    ],
+    tags: ['Analytics', 'Charts', 'Insights']
+  }
+];
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug }
+  }));
+}
+
+const { slug } = Astro.params;
+const project = projects.find((item) => item.slug === slug);
+
+if (!project) {
+  throw new Error('Project not found');
+}
+---
+
+<Layout title={project.title} description={project.excerpt} pubDate={new Date('August 08 2021')}>
+  <article class="project-detail">
+    <div class="project-hero">
+      <img src={project.image} alt={project.title} />
+    </div>
+
+    <div class="project-body">
+      <span class="project-category">{project.category}</span>
+      <h1>{project.title}</h1>
+      <p class="lead">{project.excerpt}</p>
+
+      <div class="project-tags">
+        {project.tags.map((tag) => (
+          <span>{tag}</span>
+        ))}
+      </div>
+
+      <div class="project-copy">
+        {project.details.map((p) => (
+          <p>{p}</p>
+        ))}
+      </div>
+
+      <a href="/projeler" class="back-link">← Projelerime geri dön</a>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .project-detail {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+  }
+
+  .project-hero {
+    overflow: hidden;
+    border-radius: 22px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .project-hero img {
+    display: block;
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+  }
+
+  .project-body {
+    padding: 0 0.5rem;
+  }
+
+  .project-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #a78bfa;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+
+  .lead {
+    font-size: 1.12rem;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1.25rem;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .project-tags span {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(167, 139, 250, 0.12);
+    color: #ddd6fe;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .project-copy {
+    display: grid;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.8;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    color: #c4b5fd;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  @media (max-width: 700px) {
+    .project-hero img {
+      height: 260px;
+    }
+  }
+</style>
