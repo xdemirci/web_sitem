@@ -13,63 +13,119 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
   <body>
     <Header />
     <main>
-      <!-- Video Katmanı -->
-      <p>
-        En Büyük Kabadayılık Beyefendiliktir.
-      </p>
-      <div class="video-container">
-        <video id="introVideo" autoplay muted playsinline>
-          <source src="/video/kurtlar_vadisi_polat_kisa.mp4" type="video/mp4" />
-          Tarayıcınız video etiketini desteklemiyor.
-        </video>
-
-        <!-- Kullanıcının sesi açabilmesi için buton -->
-        <button id="unmuteBtn">🔊 Sesi Aç</button>
-      </div>
-
-      <script>
-        const video = document.getElementById("introVideo") as HTMLVideoElement;
-        const unmuteBtn = document.getElementById("unmuteBtn");
-
-        // Video bittiğinde yapılacak işlem (örneğin kaybolması veya alt içeriğe kaydırması)
-        video.addEventListener("ended", () => {
-          console.log("Video tamamlandı.");
-          // video.style.display = 'none'; // Videoyu gizlemek isterseniz
-        });
-
-        // Kullanıcı etkileşimi ile sesi açma
-        unmuteBtn?.addEventListener("click", () => {
-          if (video.muted) {
-            video.muted = false;
-            unmuteBtn.textContent = "🔇 Sesi Kapat";
-          } else {
-            video.muted = true;
-            unmuteBtn.textContent = "🔊 Sesi Aç";
-          }
-        });
-      </script>
+      <section class="hero">
+        <h1 class="hero-title">Hoşgeldin! 👋</h1>
+        <p class="hero-subtitle">
+          Başımla beraber, keşfetmeye hazır mısın?
+        </p>
+        <div class="hero-links">
+          <a href="/blog" class="hero-btn">Yazılar</a>
+          <a href="/projects" class="hero-btn">Projeler</a>
+          <a href="/corner" class="hero-btn">Köşe</a>
+        </div>
+      </section>
 
       <style>
-        .video-container {
+        main {
           position: relative;
-          width: 100%;
-          max-width: 800px;
-          margin: 0 auto;
+          overflow: hidden;
+          min-height: 60vh;
+          display: flex;
+          align-items: center;
         }
-        video {
-          width: 100%;
-          border-radius: 8px;
-        }
-        #unmuteBtn {
+
+        main::before {
+          content: "";
           position: absolute;
-          bottom: 20px;
-          right: 20px;
-          padding: 8px 16px;
-          background: rgba(0, 0, 0, 0.7);
+          inset: -50%;
+          z-index: -1;
+          background: linear-gradient(
+            120deg,
+            rgba(var(--accent), 0.18),
+            rgba(var(--accent-dark), 0.1),
+            rgba(var(--accent), 0.18)
+          );
+          background-size: 200% 200%;
+          animation: gradientShift 12s ease-in-out infinite;
+          filter: blur(60px);
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .hero {
+          width: 100%;
+          text-align: center;
+        }
+
+        .hero-title {
+          font-size: 3rem;
+          margin: 0 0 0.5rem;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeSlideUp 0.7s ease-out forwards;
+        }
+
+        .hero-subtitle {
+          font-size: 1.25rem;
+          color: rgb(var(--gray));
+          margin: 0 0 2rem;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeSlideUp 0.7s ease-out 0.15s forwards;
+        }
+
+        .hero-links {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeSlideUp 0.7s ease-out 0.3s forwards;
+        }
+
+        .hero-btn {
+          display: inline-block;
+          padding: 0.75rem 1.5rem;
+          border-radius: 999px;
+          background: rgb(var(--accent));
           color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
+          text-decoration: none;
+          font-weight: 600;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hero-btn:hover {
+          transform: translateY(-3px) scale(1.05);
+          box-shadow: var(--box-shadow);
+        }
+
+        @keyframes fadeSlideUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (max-width: 720px) {
+          .hero-title {
+            font-size: 2rem;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          main::before,
+          .hero-title,
+          .hero-subtitle,
+          .hero-links {
+            animation: none;
+            opacity: 1;
+            transform: none;
+          }
         }
       </style>
     </main>

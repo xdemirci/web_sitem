@@ -1,0 +1,75 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Köşe | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <!-- Video Katmanı -->
+      <p>
+        En Büyük Kabadayılık Beyefendiliktir.
+      </p>
+      <div class="video-container">
+        <video id="introVideo" autoplay muted playsinline>
+          <source src="/video/kurtlar_vadisi_polat_kisa.mp4" type="video/mp4" />
+          Tarayıcınız video etiketini desteklemiyor.
+        </video>
+
+        <!-- Kullanıcının sesi açabilmesi için buton -->
+        <button id="unmuteBtn">🔊 Sesi Aç</button>
+      </div>
+
+      <script>
+        const video = document.getElementById("introVideo") as HTMLVideoElement;
+        const unmuteBtn = document.getElementById("unmuteBtn");
+
+        video.addEventListener("ended", () => {
+          console.log("Video tamamlandı.");
+        });
+
+        unmuteBtn?.addEventListener("click", () => {
+          if (video.muted) {
+            video.muted = false;
+            unmuteBtn.textContent = "🔇 Sesi Kapat";
+          } else {
+            video.muted = true;
+            unmuteBtn.textContent = "🔊 Sesi Aç";
+          }
+        });
+      </script>
+
+      <style>
+        .video-container {
+          position: relative;
+          width: 100%;
+          max-width: 800px;
+          margin: 0 auto;
+        }
+        video {
+          width: 100%;
+          border-radius: 8px;
+        }
+        #unmuteBtn {
+          position: absolute;
+          bottom: 20px;
+          right: 20px;
+          padding: 8px 16px;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+      </style>
+    </main>
+    <Footer />
+  </body>
+</html>

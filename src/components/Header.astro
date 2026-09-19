@@ -10,7 +10,8 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/">Anasayfa</HeaderLink>
 			<HeaderLink href="/blog">Yazılar</HeaderLink>
 			<HeaderLink href="/about">Hakkımda</HeaderLink>
-			<HeaderLink href="/projeler">Projelerim</HeaderLink>
+			<HeaderLink href="/projects">Projelerim</HeaderLink>
+			<HeaderLink href="/corner">Köşe</HeaderLink>
 		</div>
 		<div class="social-links">
 			<a href="https://github.com/xdemirci" target="_blank">
@@ -56,13 +57,13 @@ import HeaderLink from './HeaderLink.astro';
 		align-items: center;
 		justify-content: space-between;
 	}
-	nav a {
+	nav :global(a) {
 		padding: 1em 0.5em;
-		color: var(--black);
+		color: rgb(var(--black));
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
 	}
-	nav a.active {
+	nav :global(a.active) {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
 	}
