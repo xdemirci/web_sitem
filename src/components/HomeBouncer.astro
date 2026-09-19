@@ -1,0 +1,115 @@
+---
+// Floating home icon that bounces around the viewport like the classic
+// DVD-logo / Windows-XP-flying-toasters screensaver. Click it to jump home.
+
+// ── EASY SETTINGS ────────────────────────────────────────
+// Tweak these three and nothing else needs to change.
+const CIRCLE_SIZE = 88;  // px, the white circle's diameter
+const HOME_ICON_SIZE = 64; // px, the house icon inside the circle
+const SPEED = 0.75; // px moved per frame; higher = faster drifting
+// ─────────────────────────────────────────────────────────
+---
+
+<a
+	href="/"
+	class="home-bouncer"
+	aria-label="Anasayfaya dön"
+	id="homeBouncer"
+	data-size={CIRCLE_SIZE}
+	data-speed={SPEED}
+>
+	<svg viewBox="0 0 24 24" width={HOME_ICON_SIZE} height={HOME_ICON_SIZE} aria-hidden="true">
+		<path
+			fill="currentColor"
+			d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3L12 3z"
+		></path>
+	</svg>
+</a>
+
+<style define:vars={{ circleSize: `${CIRCLE_SIZE}px` }}>
+	.home-bouncer {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--circleSize);
+		height: var(--circleSize);
+		border-radius: 50%;
+		background: white;
+		color: rgb(var(--black));
+		box-shadow: var(--box-shadow);
+		will-change: transform;
+		/* JS drives position via transform; this is just the starting spot */
+		transform: translate(24px, 24px);
+	}
+
+	.home-bouncer:hover {
+		color: var(--accent);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.home-bouncer {
+			position: fixed;
+			top: auto;
+			bottom: 20px;
+			right: 20px;
+			left: auto;
+			transform: none !important;
+		}
+	}
+</style>
+
+<script is:inline>
+	(function () {
+		// Respect reduced-motion users: leave it parked, no animation loop.
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		const el = document.getElementById('homeBouncer');
+		if (!el) return;
+
+		const size = parseFloat(el.dataset.size);
+		const speed = parseFloat(el.dataset.speed);
+
+		let x = Math.random() * (window.innerWidth - size);
+		let y = Math.random() * (window.innerHeight - size);
+		let dx = (Math.random() > 0.5 ? 1 : -1) * speed;
+		let dy = (Math.random() > 0.5 ? 1 : -1) * speed;
+
+		function tick() {
+			const maxX = window.innerWidth - size;
+			const maxY = window.innerHeight - size;
+
+			x += dx;
+			y += dy;
+
+			if (x <= 0) {
+				x = 0;
+				dx = speed;
+			} else if (x >= maxX) {
+				x = maxX;
+				dx = -speed;
+			}
+
+			if (y <= 0) {
+				y = 0;
+				dy = speed;
+			} else if (y >= maxY) {
+				y = maxY;
+				dy = -speed;
+			}
+
+			el.style.transform = `translate(${x}px, ${y}px)`;
+			requestAnimationFrame(tick);
+		}
+
+		requestAnimationFrame(tick);
+
+		window.addEventListener('resize', () => {
+			x = Math.min(x, window.innerWidth - size);
+			y = Math.min(y, window.innerHeight - size);
+		});
+	})();
+</script>

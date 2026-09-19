@@ -14,7 +14,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
     <Header />
     <main>
       <section class="hero">
-        <h1 class="hero-title">Hoşgeldin! 👋</h1>
+        <h1 class="hero-title">Hoşgeldin!</h1>
         <p class="hero-subtitle">
           Başımla beraber, keşfetmeye hazır mısına?
         </p>
@@ -32,28 +32,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
           min-height: 60vh;
           display: flex;
           align-items: center;
-        }
-
-        main::before {
-          content: "";
-          position: absolute;
-          inset: -50%;
-          z-index: -1;
-          background: linear-gradient(
-            120deg,
-            rgba(var(--accent), 0.18),
-            rgba(var(--accent-dark), 0.1),
-            rgba(var(--accent), 0.18)
-          );
-          background-size: 200% 200%;
-          animation: gradientShift 12s ease-in-out infinite;
-          filter: blur(60px);
-        }
-
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
         }
 
         .hero {
@@ -92,7 +70,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
           display: inline-block;
           padding: 0.75rem 1.5rem;
           border-radius: 999px;
-          background: rgb(var(--accent));
+          background: var(--accent);
           color: white;
           text-decoration: none;
           font-weight: 600;
@@ -118,7 +96,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         }
 
         @media (prefers-reduced-motion: reduce) {
-          main::before,
           .hero-title,
           .hero-subtitle,
           .hero-links {
