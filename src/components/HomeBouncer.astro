@@ -1,13 +1,8 @@
 ---
-// Floating home icon that bounces around the viewport like the classic
-// DVD-logo / Windows-XP-flying-toasters screensaver. Click it to jump home.
-
-// ── EASY SETTINGS ────────────────────────────────────────
-// Tweak these three and nothing else needs to change.
-const CIRCLE_SIZE = 88;  // px, the white circle's diameter
-const HOME_ICON_SIZE = 64; // px, the house icon inside the circle
-const SPEED = 0.75; // px moved per frame; higher = faster drifting
-// ─────────────────────────────────────────────────────────
+const DEFAULT_CIRCLE_SIZE = 44;
+const DEFAULT_SPEED = 1.5;
+const HOME_ICON_RATIO = 0.72;
+const TUTORIAL_SECONDS = 3;
 ---
 
 <a
@@ -15,18 +10,52 @@ const SPEED = 0.75; // px moved per frame; higher = faster drifting
 	class="home-bouncer"
 	aria-label="Anasayfaya dön"
 	id="homeBouncer"
-	data-size={CIRCLE_SIZE}
-	data-speed={SPEED}
+	data-default-size={DEFAULT_CIRCLE_SIZE}
+	data-default-speed={DEFAULT_SPEED}
+	data-icon-ratio={HOME_ICON_RATIO}
 >
-	<svg viewBox="0 0 24 24" width={HOME_ICON_SIZE} height={HOME_ICON_SIZE} aria-hidden="true">
-		<path
-			fill="currentColor"
-			d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3L12 3z"
-		></path>
+	<svg id="homeBouncerIcon" viewBox="0 0 24 24" aria-hidden="true">
+		<path fill="currentColor" d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3L12 3z"></path>
 	</svg>
 </a>
 
-<style define:vars={{ circleSize: `${CIRCLE_SIZE}px` }}>
+<div class="bouncer-widget" data-seconds={TUTORIAL_SECONDS}>
+	<div class="bouncer-toggle-wrap">
+		<svg class="bouncer-progress-ring" viewBox="0 0 40 40" aria-hidden="true">
+			<circle class="ring-bg" cx="20" cy="20" r="17"></circle>
+			<circle class="ring-progress" id="bouncerProgressRing" cx="20" cy="20" r="17"></circle>
+		</svg>
+		<button
+			type="button"
+			class="bouncer-settings-toggle"
+			id="bouncerSettingsToggle"
+			aria-label="Gezinme ikonu ayarları"
+		>
+			⚙️
+		</button>
+	</div>
+
+	<div class="bouncer-settings-panel" id="bouncerSettingsPanel">
+		<label>
+			Boyut
+			<input type="range" id="bouncerSizeInput" min="28" max="90" step="1" />
+		</label>
+		<label>
+			Hız
+			<input type="range" id="bouncerSpeedInput" min="0" max="4" step="0.1" />
+		</label>
+		<button type="button" id="bouncerResetBtn">Varsayılana dön</button>
+	</div>
+
+	<div class="bouncer-tutorial-tip" id="bouncerTutorialTip">
+		Bu pencere, gezinme ikonunun boyutunu ve hızını ayarlamanı sağlar.
+		<div class="tip-progress-track">
+			<div class="tip-progress-fill" id="tipProgressFill"></div>
+		</div>
+	</div>
+</div>
+
+<style>
 	.home-bouncer {
 		position: fixed;
 		top: 0;
@@ -35,19 +64,153 @@ const SPEED = 0.75; // px moved per frame; higher = faster drifting
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: var(--circleSize);
-		height: var(--circleSize);
 		border-radius: 50%;
 		background: white;
 		color: rgb(var(--black));
 		box-shadow: var(--box-shadow);
 		will-change: transform;
-		/* JS drives position via transform; this is just the starting spot */
 		transform: translate(24px, 24px);
 	}
 
 	.home-bouncer:hover {
 		color: var(--accent);
+	}
+
+	/* Single anchored stack: toggle at the bottom, panel and tip grow upward
+	   from it in order, so they always line up on the same left edge with
+	   consistent spacing regardless of content height. */
+	.bouncer-widget {
+		position: fixed;
+		bottom: 16px;
+		left: 16px;
+		z-index: 1000;
+		display: flex;
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+
+	.bouncer-toggle-wrap {
+		position: relative;
+		width: 40px;
+		height: 40px;
+	}
+
+	.bouncer-settings-toggle {
+		position: absolute;
+		inset: 0;
+		width: 36px;
+		height: 36px;
+		margin: auto;
+		border-radius: 50%;
+		border: none;
+		background: white;
+		box-shadow: var(--box-shadow);
+		cursor: pointer;
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.bouncer-progress-ring {
+		position: absolute;
+		inset: 0;
+		width: 40px;
+		height: 40px;
+		transform: rotate(-90deg);
+		pointer-events: none;
+	}
+
+	.ring-bg {
+		fill: none;
+		stroke: rgb(var(--gray-light));
+		stroke-width: 3;
+	}
+
+	.ring-progress {
+		fill: none;
+		stroke: var(--accent);
+		stroke-width: 3;
+		stroke-linecap: round;
+		/* circumference for r=17 is ~106.8 */
+		stroke-dasharray: 106.8;
+		stroke-dashoffset: 106.8;
+	}
+
+	.ring-progress.is-counting {
+		transition: stroke-dashoffset linear;
+	}
+
+	.bouncer-tutorial-tip {
+		display: none;
+		width: 200px;
+		background: rgb(var(--black));
+		color: white;
+		border-radius: 8px;
+		padding: 0.6rem 0.75rem;
+		font-size: 0.8rem;
+		line-height: 1.3;
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+
+	.bouncer-tutorial-tip.is-open {
+		display: block;
+	}
+
+	.bouncer-tutorial-tip.is-visible {
+		opacity: 1;
+	}
+
+	.tip-progress-track {
+		margin-top: 0.5rem;
+		width: 100%;
+		height: 4px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.25);
+		overflow: hidden;
+	}
+
+	.tip-progress-fill {
+		width: 0%;
+		height: 100%;
+		background: white;
+		border-radius: 999px;
+	}
+
+	.tip-progress-fill.is-counting {
+		transition: width linear;
+	}
+
+	.bouncer-settings-panel {
+		display: none;
+		width: 200px;
+		background: white;
+		border-radius: 12px;
+		box-shadow: var(--box-shadow);
+		padding: 1rem;
+		flex-direction: column;
+		gap: 0.75rem;
+		font-size: 0.85rem;
+	}
+
+	.bouncer-settings-panel.is-open {
+		display: flex;
+	}
+
+	.bouncer-settings-panel label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		color: rgb(var(--gray-dark));
+	}
+
+	.bouncer-settings-panel button {
+		border: none;
+		background: rgb(var(--gray-light));
+		border-radius: 6px;
+		padding: 0.4rem;
+		cursor: pointer;
+		font-size: 0.8rem;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -59,19 +222,65 @@ const SPEED = 0.75; // px moved per frame; higher = faster drifting
 			left: auto;
 			transform: none !important;
 		}
+		.bouncer-widget {
+			display: none;
+		}
 	}
 </style>
 
 <script is:inline>
 	(function () {
-		// Respect reduced-motion users: leave it parked, no animation loop.
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
 		const el = document.getElementById('homeBouncer');
+		const icon = document.getElementById('homeBouncerIcon');
+		const widget = document.querySelector('.bouncer-widget');
+		const toggle = document.getElementById('bouncerSettingsToggle');
+		const panel = document.getElementById('bouncerSettingsPanel');
+		const tip = document.getElementById('bouncerTutorialTip');
+		const ring = document.getElementById('bouncerProgressRing');
+		const barFill = document.getElementById('tipProgressFill');
 		if (!el) return;
 
-		const size = parseFloat(el.dataset.size);
-		const speed = parseFloat(el.dataset.speed);
+		const defaultSize = parseFloat(el.dataset.defaultSize);
+		const defaultSpeed = parseFloat(el.dataset.defaultSpeed);
+		const iconRatio = parseFloat(el.dataset.iconRatio);
+		const tutorialSeconds = parseFloat(widget.dataset.seconds);
+		const CIRCUMFERENCE = 106.8;
+		const STORAGE_KEY = 'homeBouncerSettings';
+
+		function loadSettings() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+				return {
+					size: typeof saved.size === 'number' ? saved.size : defaultSize,
+					speed: typeof saved.speed === 'number' ? saved.speed : defaultSpeed,
+				};
+			} catch {
+				return { size: defaultSize, speed: defaultSpeed };
+			}
+		}
+
+		function saveSettings(settings) {
+			try {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+			} catch {
+				// ignore
+			}
+		}
+
+		let { size, speed } = loadSettings();
+		document.getElementById('bouncerSizeInput').value = String(size);
+		document.getElementById('bouncerSpeedInput').value = String(speed);
+
+		function applyAppearance() {
+			el.style.width = `${size}px`;
+			el.style.height = `${size}px`;
+			const iconSize = size * iconRatio;
+			icon.setAttribute('width', String(iconSize));
+			icon.setAttribute('height', String(iconSize));
+		}
+		applyAppearance();
 
 		let x = Math.random() * (window.innerWidth - size);
 		let y = Math.random() * (window.innerHeight - size);
@@ -81,35 +290,85 @@ const SPEED = 0.75; // px moved per frame; higher = faster drifting
 		function tick() {
 			const maxX = window.innerWidth - size;
 			const maxY = window.innerHeight - size;
-
 			x += dx;
 			y += dy;
-
-			if (x <= 0) {
-				x = 0;
-				dx = speed;
-			} else if (x >= maxX) {
-				x = maxX;
-				dx = -speed;
-			}
-
-			if (y <= 0) {
-				y = 0;
-				dy = speed;
-			} else if (y >= maxY) {
-				y = maxY;
-				dy = -speed;
-			}
-
+			if (x <= 0) { x = 0; dx = speed || 0.01; }
+			else if (x >= maxX) { x = maxX; dx = -(speed || 0.01); }
+			if (y <= 0) { y = 0; dy = speed || 0.01; }
+			else if (y >= maxY) { y = maxY; dy = -(speed || 0.01); }
 			el.style.transform = `translate(${x}px, ${y}px)`;
 			requestAnimationFrame(tick);
 		}
-
 		requestAnimationFrame(tick);
 
 		window.addEventListener('resize', () => {
 			x = Math.min(x, window.innerWidth - size);
 			y = Math.min(y, window.innerHeight - size);
 		});
+
+		toggle.addEventListener('click', (e) => {
+			e.stopPropagation();
+			panel.classList.toggle('is-open');
+		});
+
+		document.addEventListener('click', (e) => {
+			if (panel.classList.contains('is-open') && !panel.contains(e.target) && e.target !== toggle) {
+				panel.classList.remove('is-open');
+			}
+		});
+
+		document.getElementById('bouncerSizeInput').addEventListener('input', (e) => {
+			size = parseFloat(e.target.value);
+			applyAppearance();
+			saveSettings({ size, speed });
+		});
+
+		document.getElementById('bouncerSpeedInput').addEventListener('input', (e) => {
+			speed = parseFloat(e.target.value);
+			const signX = dx < 0 ? -1 : 1;
+			const signY = dy < 0 ? -1 : 1;
+			dx = signX * speed;
+			dy = signY * speed;
+			saveSettings({ size, speed });
+		});
+
+		document.getElementById('bouncerResetBtn').addEventListener('click', () => {
+			size = defaultSize;
+			speed = defaultSpeed;
+			document.getElementById('bouncerSizeInput').value = String(size);
+			document.getElementById('bouncerSpeedInput').value = String(speed);
+			applyAppearance();
+			const signX = dx < 0 ? -1 : 1;
+			const signY = dy < 0 ? -1 : 1;
+			dx = signX * speed;
+			dy = signY * speed;
+			saveSettings({ size, speed });
+		});
+
+		// ── Tutorial flash + filling ring countdown, every page load ──
+		panel.classList.add('is-open');
+		tip.classList.add('is-open');
+		requestAnimationFrame(() => tip.classList.add('is-visible'));
+
+		ring.classList.remove('is-counting');
+		ring.style.transition = 'none';
+		ring.style.strokeDashoffset = String(CIRCUMFERENCE);
+		barFill.classList.remove('is-counting');
+		barFill.style.transition = 'none';
+		barFill.style.width = '0%';
+		// Force reflow so the browser registers the reset before animating.
+		void ring.getBoundingClientRect();
+		ring.classList.add('is-counting');
+		ring.style.transition = `stroke-dashoffset ${tutorialSeconds}s linear`;
+		ring.style.strokeDashoffset = '0';
+		barFill.classList.add('is-counting');
+		barFill.style.transition = `width ${tutorialSeconds}s linear`;
+		barFill.style.width = '100%';
+
+		setTimeout(() => {
+			tip.classList.remove('is-visible');
+			panel.classList.remove('is-open');
+			setTimeout(() => tip.classList.remove('is-open'), 400);
+		}, tutorialSeconds * 1000);
 	})();
 </script>
