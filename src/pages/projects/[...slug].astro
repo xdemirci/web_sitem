@@ -1,5 +1,6 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
@@ -16,5 +17,33 @@ const { Content } = await render(project);
 ---
 
 <BlogPost {...project.data}>
+	{project.data.video && (
+		<video controls width="100%" style="border-radius: 8px; margin-bottom: 1.5rem;">
+			<source src={project.data.video} type="video/mp4" />
+		</video>
+	)}
+
 	<Content />
+
+	{project.data.gallery && project.data.gallery.length > 0 && (
+		<div class="gallery">
+			{project.data.gallery.map((img) => (
+				<Image src={img} alt="" width={600} height={400} />
+			))}
+		</div>
+	)}
 </BlogPost>
+
+<style>
+	.gallery {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1rem;
+		margin-top: 1.5rem;
+	}
+	.gallery img {
+		border-radius: 8px;
+		width: 100%;
+		height: auto;
+	}
+</style>

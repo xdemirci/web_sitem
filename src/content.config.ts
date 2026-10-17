@@ -18,7 +18,6 @@ const blog = defineCollection({
 });
 
 const projects = defineCollection({
-	// Load Markdown and MDX files in the `src/content/projects/` directory.
 	loader: glob({ base: './src/content/projects', pattern: '**/*.{md,mdx}' }),
 	schema: ({ image }) =>
 		z.object({
@@ -26,9 +25,12 @@ const projects = defineCollection({
 			description: z.string(),
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
-			heroImage: z.optional(image()),
-			link: z.string().url().optional(), // e.g. live demo or GitHub repo
+			heroImage: z.optional(image()), // thumbnail, kart görünümünde kullanılır
+			video: z.string().optional(),   // /video/dosya.mp4
+			gallery: z.array(image()).optional(), // ek resimler
+			link: z.string().url().optional(),
 		}),
 });
+
 
 export const collections = { blog, projects };
