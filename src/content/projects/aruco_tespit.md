@@ -11,4 +11,5 @@ gallery:
   - '../../assets/sky4.png'
 ---
 
-Açıklama buraya.
+Skywalker X8 QuadPlane VTOL ile 4X4 aruco tespiti. Logitech F310 Joystick Xbox seri bağlantı ile gazebo dünyasında RC uçuş. 
+FBWA modu. Kamera ve gstreamer eklentisi.

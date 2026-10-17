@@ -17,22 +17,27 @@ const { Content } = await render(project);
 ---
 
 <BlogPost {...project.data}>
-	{project.data.video && (
-		<video controls width="100%" style="border-radius: 8px; margin-bottom: 1.5rem;">
-			<source src={project.data.video} type="video/mp4" />
-		</video>
-	)}
-
 	<Content />
 
 	{project.data.gallery && project.data.gallery.length > 0 && (
 		<div class="gallery">
-			{project.data.gallery.map((img) => (
-				<Image src={img} alt="" width={600} height={400} />
+			{project.data.gallery.map((img, i) => (
+				<img
+					class="gallery-thumb"
+					src={img.src}
+					data-full={img.src}
+					data-index={i}
+					alt=""
+					loading="lazy"
+				/>
 			))}
 		</div>
 	)}
 </BlogPost>
+
+<div class="lightbox" id="lightbox">
+	<img id="lightboxImg" src="" alt="" />
+</div>
 
 <style>
 	.gallery {
@@ -41,9 +46,60 @@ const { Content } = await render(project);
 		gap: 1rem;
 		margin-top: 1.5rem;
 	}
-	.gallery img {
+	.gallery-thumb {
 		border-radius: 8px;
 		width: 100%;
 		height: auto;
+		cursor: pointer;
+		transition: transform 0.15s ease;
+	}
+	.gallery-thumb:hover {
+		transform: scale(1.03);
+	}
+	.lightbox {
+		display: none;
+		position: fixed;
+		inset: 0;
+		z-index: 2000;
+		background: rgba(0, 0, 0, 0.85);
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+	}
+	.lightbox.is-open {
+		display: flex;
+	}
+	.lightbox img {
+		max-width: 90vw;
+		max-height: 90vh;
+		border-radius: 8px;
 	}
 </style>
+
+<script is:inline>
+	(function () {
+		const lightbox = document.getElementById('lightbox');
+		const lightboxImg = document.getElementById('lightboxImg');
+
+		document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
+			thumb.addEventListener('click', () => {
+				lightboxImg.src = thumb.dataset.full;
+				lightbox.classList.add('is-open');
+			});
+		});
+
+		function closeLightbox() {
+			lightbox.classList.remove('is-open');
+			lightboxImg.src = '';
+		}
+
+		lightbox.addEventListener('click', closeLightbox);
+
+		document.addEventListener('keydown', (e) => {
+			if ((e.key === 'Escape' || e.key === ' ') && lightbox.classList.contains('is-open')) {
+				e.preventDefault();
+				closeLightbox();
+			}
+		});
+	})();
+</script>

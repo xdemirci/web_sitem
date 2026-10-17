@@ -35,10 +35,14 @@ const projects = (await getCollection('projects')).sort(
 				text-decoration: none;
 				transition: 0.2s ease;
 			}
-			ul li img {
+			ul li img,
+			ul li video {
 				margin-bottom: 0.5rem;
 				border-radius: 12px;
 				width: 100%;
+				aspect-ratio: 16 / 9;
+				object-fit: cover;
+				display: block;
 			}
 			ul li a {
 				display: block;
@@ -56,7 +60,8 @@ const projects = (await getCollection('projects')).sort(
 			ul li a:hover .date {
 				color: rgb(var(--accent));
 			}
-			ul a:hover img {
+			ul a:hover img,
+			ul a:hover video {
 				box-shadow: var(--box-shadow);
 			}
 			@media (max-width: 720px) {
@@ -79,8 +84,14 @@ const projects = (await getCollection('projects')).sort(
 						projects.map((project) => (
 							<li>
 								<a href={`/projects/${project.id}/`}>
-									{project.data.heroImage && (
-										<Image width={720} height={360} src={project.data.heroImage} alt="" />
+									{project.data.video ? (
+										<video autoplay muted loop playsinline>
+											<source src={project.data.video} type="video/mp4" />
+										</video>
+									) : (
+										project.data.heroImage && (
+											<Image width={400} height={225} src={project.data.heroImage} alt="" />
+										)
 									)}
 									<h4 class="title">{project.data.title}</h4>
 									<p class="date">
